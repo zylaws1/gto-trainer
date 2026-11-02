@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTO Trainer</title>
+<link rel="icon" id="favicon" type="image/svg+xml" href="favicon.svg?v=917bab13">
+<link rel="stylesheet" href="css/style.css?v=917bab13">
+</head>
+<body>
+<div class="topbar">
+  <span class="brand brand-only"><img class="logo" src="favicon.svg?v=917bab13" alt=""><b>GTO Trainer</b><span class="tagline" data-en="GTO-style Hold'em decision practice">GTO 风格的德州扑克决策练习</span>
+    <a class="by-vber" href="https://vber-ai.com" target="_blank" rel="noopener" title="由 Vber AI Technology 开发" data-en-title="Built by Vber AI Technology">
+      <span class="by-pre" data-en="by"></span><img src="vber-logo.svg?v=917bab13" alt="Vber AI"><span class="vber-word">vber<span class="vdot">.</span>ai</span><span class="by-post" data-en="">出品</span>
+    </a>
+  </span>
+  <span class="stealth-only"><img class="logo" src="favicon-stealth.svg?v=917bab13" alt=""> <b>core-service</b></span>
+  <span class="branch stealth-only">⎇ main</span>
+  <span class="spacer"></span>
+  <div class="runcfg" title="训练设置" data-en-title="Training settings">
+    <span class="run">▶</span>
+    <select id="cfg-game"><option value="cash" data-en="Cash game">现金局</option><option value="mtt" data-en="Tournament (MTT)">锦标赛 MTT</option></select>
+    <select id="cfg-players">
+      <option value="2" data-en="2 (heads-up)">2人（单挑）</option><option value="3" data-en="3-handed">3人</option><option value="4" data-en="4-handed">4人</option><option value="5" data-en="5-handed">5人</option>
+      <option value="6" data-en="6-max">6人</option><option value="7" data-en="7-handed">7人</option><option value="8" data-en="8-handed">8人</option><option value="9" data-en="9 (full ring)">9人（满桌）</option>
+    </select>
+    <select id="cfg-stack">
+      <option value="0" data-en="Stack: random">筹码：随机</option><option value="10">10bb</option><option value="15">15bb</option><option value="20">20bb</option>
+      <option value="25">25bb</option><option value="30">30bb</option><option value="40">40bb</option><option value="60">60bb</option><option value="100">100bb</option>
+    </select>
+    <select id="cfg-stage"><option value="normal" data-en="Normal stage">常规阶段</option><option value="bubble" data-en="Bubble (ICM)">泡沫期 (ICM)</option><option value="ft" data-en="Final table (ICM)">决赛桌 (ICM)</option></select>
+  </div>
+  <select id="lang" class="lang-sel" title="语言 / Language"><option value="zh">中文</option><option value="en">EN</option></select>
+  <button class="ico-btn" id="help-btn" title="帮助（?）" data-en-title="Help (?)">?</button>
+  <button class="ico-btn" id="settings-btn" title="设置" data-en-title="Settings">⚙</button>
+  <div id="settings-pop" class="popover" hidden>
+    <div class="pop-title" data-en="Settings">设置</div>
+    <label class="pop-row"><span data-en="Stealth mode<small>Looks like an IDE · Esc shows fake code</small>">隐身模式<small>伪装成代码编辑器 · Esc 切换到假代码</small></span><input type="checkbox" id="pref-stealth"></label>
+    <label class="pop-row"><span data-en="Theme">主题</span><select id="pref-theme"><option value="dark" data-en="Dark (Darcula)">深色（Darcula）</option><option value="light" data-en="Light (IntelliJ Light)">浅色（IntelliJ Light）</option></select></label>
+    <label class="pop-row"><span data-en="Auto-continue when best<small>Skip the Continue button for faster reps</small>">答对（最佳）时自动继续<small>跳过「继续」按钮，练得更快</small></span><input type="checkbox" id="pref-autonext"></label>
+    <label class="pop-row"><span data-en="Reveal villain cards at hand end<small>Even without a showdown</small>">每手结束时亮出对手手牌<small>即使对手没有摊牌</small></span><input type="checkbox" id="pref-reveal"></label>
+    <label class="pop-row"><span data-en="Show villain range &amp; my equity<small>Shortcut H</small>">决策时显示对手范围和胜率<small>快捷键 H</small></span><input type="checkbox" id="hints"></label>
+    <div class="pop-sep"></div>
+    <button id="export-btn" data-en="Export hand history (.txt)">导出手牌记录 (.txt)</button>
+    <button id="reset-stats" class="danger" data-en="Reset stats">重置统计</button>
+  </div>
+</div>
+
+<div class="ide">
+  <aside class="project">
+    <div class="tw-title"><span class="stealth-only">Project</span><span class="brand-only" data-en="Practice">练习</span></div>
+    <div class="tree">
+      <div class="node stealth-only">▾ 📁 core-service</div>
+      <div class="node l1 stealth-only">▾ 📁 src/main/java</div>
+      <div class="node l2 stealth-only">▾ 📁 com.acme.order</div>
+      <nav id="modes">
+        <button data-mode="full" data-file="FullHand.java" class="active l3"><i class="jf">C</i><span class="fname">FullHand.java</span> <span class="muted" data-en="Full hand">完整牌局</span></button>
+        <button data-mode="preflop" data-file="Preflop.java" class="l3"><i class="jf">C</i><span class="fname">Preflop.java</span> <span class="muted" data-en="Preflop drill">翻前练习</span></button>
+        <button data-mode="postflop" data-file="Postflop.java" class="l3"><i class="jf">C</i><span class="fname">Postflop.java</span> <span class="muted" data-en="Postflop drill">翻后练习</span></button>
+        <button data-mode="review" data-file="Review.md" class="l3"><i class="jf md">M</i><span class="fname">Review.md</span> <span class="muted" data-en="Mistakes">错题本</span></button>
+        <button data-mode="stats" data-file="Stats.md" class="l3"><i class="jf md">M</i><span class="fname">Stats.md</span> <span class="muted" data-en="Stats">统计</span></button>
+      </nav>
+      <div class="node l2 dim stealth-only">▸ 📁 com.acme.payment</div>
+      <div class="node l1 dim stealth-only">▸ 📁 src/test/java</div>
+      <div class="node l1 dim stealth-only">　 pom.xml</div>
+    </div>
+    <div id="filter-box">
+      <div class="tw-title" data-en="Spot filter <span class=&quot;muted&quot;>(postflop drill)</span>">练习筛选 <span class="muted">（翻后练习）</span></div>
+      <label><span data-en="Street">街</span><select id="flt-street"><option value="any" data-en="Any">任意</option><option value="flop" data-en="Flop">翻牌</option><option value="turn" data-en="Turn">转牌</option><option value="river" data-en="River">河牌</option></select></label>
+      <label><span data-en="Situation">局面</span><select id="flt-sit"><option value="any" data-en="Any">任意</option><option value="first" data-en="First / checked to">先行动/被过牌</option><option value="facing" data-en="Facing a bet">面对下注</option><option value="raise" data-en="Facing a raise">面对加注</option></select></label>
+      <label><span data-en="Hand">牌力</span><select id="flt-cls"><option value="any" data-en="Any">任意</option><option value="air" data-en="Air">空气</option><option value="draw" data-en="Draw">听牌</option><option value="bottom" data-en="Bottom pair">底对</option><option value="middle" data-en="Middle pair">中对</option><option value="top" data-en="Top pair">顶对</option><option value="over" data-en="Overpair">超对</option><option value="strong" data-en="Two pair+">两对以上</option></select></label>
+      <label><span data-en="Pot">底池</span><select id="flt-pot"><option value="any" data-en="Any">任意</option><option value="srp" data-en="Single-raised">单次加注</option><option value="3bet">3-bet</option><option value="multi" data-en="Multiway (3)">多人（3人）</option></select></label>
+      <button id="flt-reset" data-en="Clear filter">清除筛选</button>
+      <p class="muted" data-en="Setting a filter switches to the postflop drill and deals only matching spots; earlier streets are auto-played at best EV.">设置后自动切到「翻后练习」，只出符合条件的局面；之前的街会自动按最佳打法进行。</p>
+    </div>
+  </aside>
+
+  <section class="editor">
+    <div class="tabs"><span class="tab active"><i class="jf stealth-only">C</i><span id="tab-name">FullHand.java</span></span><span class="tab dim stealth-only"><i class="jf">C</i>OrderService.java</span></div>
+    <div class="editor-body">
+     <div id="play-area">
+      <div id="seats"></div>
+      <div id="seat-legend"></div>
+      <div class="table">
+        <div class="row">
+          <div class="who"><span class="kw">val</span> <span id="villain-label">对手</span> <span class="pos" id="villain-pos"></span></div>
+          <div class="cards" id="villain-cards"></div>
+          <div class="money"><span id="villain-stack"></span><span class="bet" id="villain-bet"></span></div>
+        </div>
+        <div class="row" id="villain2-row" hidden>
+          <div class="who"><span class="kw">val</span> <span data-en="villain2">对手2</span> <span class="pos" id="villain2-pos"></span></div>
+          <div class="cards" id="villain2-cards"></div>
+          <div class="money"><span id="villain2-stack"></span><span class="bet" id="villain2-bet"></span></div>
+        </div>
+        <div class="row">
+          <div class="who"><span class="kw">val</span> <span data-en="board">公共牌</span></div>
+          <div class="board" id="board"></div>
+          <div class="money"><span class="pot" id="pot"></span></div>
+        </div>
+        <div class="row hero-row">
+          <div class="who"><span class="kw">val</span> <span data-en="hero">你</span> <span class="pos" id="hero-pos"></span></div>
+          <div class="cards" id="hero-cards"></div>
+          <div class="money"><span id="hero-stack"></span><span class="bet" id="hero-bet"></span></div>
+        </div>
+      </div>
+      <div id="situation"></div>
+      <div id="actions"></div>
+      <div class="toolbar">
+        <span class="muted kbd-hints"><span data-en="<kbd>F</kbd> fold <kbd>C</kbd> check/call <kbd>1-5</kbd> bet <kbd>R</kbd> raise <kbd>A</kbd> all-in <kbd>↵</kbd> continue <kbd>?</kbd> help"><kbd>F</kbd> 弃牌 <kbd>C</kbd> 过牌/跟注 <kbd>1-5</kbd> 下注 <kbd>R</kbd> 加注 <kbd>A</kbd> 全下 <kbd>↵</kbd> 继续 <kbd>?</kbd> 帮助</span> <span class="stealth-only" data-en="<kbd>Esc</kbd> code view"><kbd>Esc</kbd> 代码视图</span></span>
+        <button id="new-hand" data-en="New hand <kbd>N</kbd>">新的一手 <kbd>N</kbd></button>
+      </div>
+      <div id="hint-panel"></div>
+     </div>
+     <div id="review-area" hidden></div>
+     <div id="stats-area" hidden></div>
+    </div>
+    <div class="console">
+      <div class="tw-title"><span class="stealth-only">Run: <span class="muted">Application</span></span><span class="brand-only" data-en="Hand log">本手记录</span></div>
+      <div id="log-wrap"><div id="log"></div></div>
+    </div>
+  </section>
+
+  <aside class="inspector">
+    <div class="tw-title"><span class="stealth-only">Analysis</span><span class="brand-only" data-en="Analysis">分析</span></div>
+    <div id="feedback"><p class="muted" data-en="After each decision the EV of every option appears here.">做出决策后，这里会显示每个选项的 EV 分析。</p></div>
+    <details class="note muted">
+      <summary data-en="About the model">关于计算模型</summary>
+      <span data-en="GTO Trainer is a GTO-style practice tool: it approximates solver strategy rather than running a full solver, so treat close spots as guidance, not gospel. Preflop: approximate solver-style charts with mixed frequencies; push/fold and calls vs all-ins use real EV; ICM uses a Malmuth-Harville model. Postflop: Monte Carlo against a villain who plays vs your range — it raises and check-raises, bluffs with draws, sizes by board texture, and narrows its range every street; 3-bet/4-bet and 3-way pots are supported. Options within the noise band of the best all count as correct. A practice approximation, not a full solver.">GTO Trainer 是 GTO 风格的练习工具：它近似 solver 的策略，而不是运行完整的求解器，接近的局面请当作参考而非定论。翻前：近似 solver 范围表（含混合频率）；推/弃与面对全下按真实 EV 计算；ICM 用 Malmuth-Harville 模型。翻后：蒙特卡洛模拟，对手针对你的范围行动——会加注/过牌加注、用听牌诈唬、按牌面选尺度，范围每条街收窄；支持 3-bet/4-bet 与 3 人底池。EV 差距在误差带内的选项都算正确。是练习近似，非完整求解器。</span>
+    </details>
+  </aside>
+</div>
+
+<div class="statusbar">
+  <span class="stealth-only">core-service › src › main › java › com › acme › order</span>
+  <span id="cfg-status"></span>
+  <div id="recent" title="最近的决策（● 最佳 ◐ 良好 ▲ 不精确 ✕ 严重失误）" data-en-title="Recent decisions (● best ◐ good ▲ inaccuracy ✕ blunder)"></div>
+  <div id="stats"></div>
+  <span class="stealth-only">UTF-8</span><span class="stealth-only">LF</span><span class="stealth-only">Java 21</span>
+  <span class="brand-only legal" data-en="Training only · no real money · data stays in your browser · <a href=&quot;https://vber-ai.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;>Vber AI</a>">仅供学习训练 · 不涉及真钱 · 数据只保存在你的浏览器 · <a href="https://vber-ai.com/zh/" target="_blank" rel="noopener">Vber AI</a></span>
+</div>
+
+<div id="help" class="overlay" hidden>
+  <div class="dialog">
+    <div class="dialog-head"><span data-en="Help">帮助</span> <button class="ico-btn" id="help-close" title="关闭（Esc）" data-en-title="Close (Esc)">✕</button></div>
+    <div class="dialog-body" data-en="
+      &lt;h4&gt;Practice modes (files on the left)&lt;/h4&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;b&gt;FullHand&lt;/b&gt;: play a hand from preflop to the river; every decision is graded.&lt;/li&gt;
+        &lt;li&gt;&lt;b&gt;Preflop&lt;/b&gt;: quick reps on opens, facing opens, facing 3-bets and push/fold.&lt;/li&gt;
+        &lt;li&gt;&lt;b&gt;Postflop&lt;/b&gt;: starts on the flop; combine it with the Spot filter (bottom left) to drill one situation, e.g. flop · facing a bet · middle pair.&lt;/li&gt;
+        &lt;li&gt;&lt;b&gt;Review&lt;/b&gt;: your recent decisions — redo the mistakes. &lt;b&gt;Stats&lt;/b&gt;: accuracy and weakest areas by street, situation, hand strength and position.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;h4&gt;How grading works&lt;/h4&gt;
+      &lt;ul&gt;
+        &lt;li&gt;Every option gets an &lt;b&gt;EV&lt;/b&gt; (expected chips won from here, relative to folding, in bb). The highest EV is best; options within simulation noise of the best are tagged &quot;≈best&quot; and also count as correct.&lt;/li&gt;
+        &lt;li&gt;Ratings: &lt;span class=&quot;rating best&quot;&gt;Best&lt;/span&gt; &lt;span class=&quot;rating good&quot;&gt;Good&lt;/span&gt; &lt;span class=&quot;rating inacc&quot;&gt;Inaccuracy&lt;/span&gt; &lt;span class=&quot;rating blunder&quot;&gt;Blunder&lt;/span&gt;, based on EV lost as a share of the pot. Preflop chart spots are graded by solver frequency.&lt;/li&gt;
+        &lt;li&gt;The icons in the status bar are your recent decisions: ● best ◐ good ▲ inaccuracy ✕ blunder.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;h4&gt;Shortcuts&lt;/h4&gt;
+      &lt;p&gt;&lt;kbd&gt;F&lt;/kbd&gt; fold &lt;kbd&gt;C&lt;/kbd&gt; check/call &lt;kbd&gt;1&lt;/kbd&gt;–&lt;kbd&gt;5&lt;/kbd&gt; bet sizes &lt;kbd&gt;R&lt;/kbd&gt; raise &lt;kbd&gt;A&lt;/kbd&gt; all-in &lt;kbd&gt;↵&lt;/kbd&gt; continue &lt;kbd&gt;N&lt;/kbd&gt; new hand &lt;kbd&gt;H&lt;/kbd&gt; toggle range hint &lt;kbd&gt;?&lt;/kbd&gt; help &lt;kbd&gt;Esc&lt;/kbd&gt; switch to the code view (boss key, stealth mode only)&lt;/p&gt;
+      &lt;h4&gt;Positions&lt;/h4&gt;
+      &lt;p&gt;UTG under the gun · MP middle · LJ lojack · HJ hijack · CO cutoff · BTN button (acts last postflop) · SB small blind · BB big blind. Hover a seat in the diagram for details.&lt;/p&gt;
+      &lt;h4&gt;About &amp;amp; privacy&lt;/h4&gt;
+      &lt;p&gt;This is a study tool for practising decisions. There is no real-money play, and it does not offer or promote gambling — follow the laws where you live and gamble responsibly. Your stats, review log and settings are stored only in this browser (localStorage) and are never uploaded; clearing your browser data removes them.&lt;/p&gt;
+      &lt;p&gt;GTO Trainer is built by &lt;a href=&quot;https://vber-ai.com&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Vber AI Technology&lt;/a&gt;.&lt;/p&gt;
+    ">
+      <h4>练习模式（左侧文件）</h4>
+      <ul>
+        <li><b>FullHand 完整牌局</b>：从翻前打到河牌，每个决策都评分。</li>
+        <li><b>Preflop 翻前练习</b>：开池、面对加注、面对 3-bet、推/弃等翻前局面快速刷题。</li>
+        <li><b>Postflop 翻后练习</b>：直接从翻牌开始；配合左下「练习筛选」只练特定局面（例如：翻牌 · 面对下注 · 中对）。</li>
+        <li><b>Review 错题本</b>：最近的决策记录，可以「重做」失误。<b>Stats 统计</b>：按街、局面、牌力、位置查看准确率和最弱项。</li>
+      </ul>
+      <h4>怎么评分</h4>
+      <ul>
+        <li>每个选项都计算 <b>EV</b>（相对于弃牌的期望筹码收益，单位 bb）。EV 最高的是最佳；与最佳相差在模拟误差内的选项标「≈最佳」，同样算对。</li>
+        <li>评分：<span class="rating best">最佳</span> <span class="rating good">良好</span> <span class="rating inacc">不精确</span> <span class="rating blunder">严重失误</span>，按 EV 损失占底池的比例划分。翻前范围题按 solver 频率评分。</li>
+        <li>状态栏的小图标是最近的决策：● 最佳 ◐ 良好 ▲ 不精确 ✕ 严重失误。</li>
+      </ul>
+      <h4>快捷键</h4>
+      <p><kbd>F</kbd> 弃牌 <kbd>C</kbd> 过牌/跟注 <kbd>1</kbd>–<kbd>5</kbd> 下注尺度 <kbd>R</kbd> 加注 <kbd>A</kbd> 全下 <kbd>↵</kbd> 继续 <kbd>N</kbd> 新的一手 <kbd>H</kbd> 显示/隐藏范围提示 <kbd>?</kbd> 帮助 <kbd>Esc</kbd> 切换到代码视图（老板键，仅隐身模式）</p>
+      <h4>位置速查</h4>
+      <p>UTG 枪口位 · MP 中位 · LJ 低劫位 · HJ 劫位 · CO 关煞位 · BTN 庄位（翻后最后行动）· SB 小盲 · BB 大盲。鼠标悬停座位图可看详细说明。</p>
+      <h4>关于与隐私</h4>
+      <p>本工具仅用于学习和练习决策，不涉及任何真钱游戏，也不提供或推广赌博。请遵守你所在地区的法律，理性对待博彩。你的统计、错题本和设置只保存在本机浏览器（localStorage），不会上传到任何服务器；清除浏览器数据即可全部删除。</p>
+      <p>GTO 训练器由 <a href="https://vber-ai.com/zh/" target="_blank" rel="noopener">Vber AI Technology</a> 开发。</p>
+    </div>
+  </div>
+</div>
+
+<div id="cover" hidden>
+<div class="tabs"><span class="tab active"><i class="jf">C</i>OrderService.java</span></div>
+<pre class="code"><span class="ln"> 1</span><span class="kw">package</span> com.acme.order;
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kw">import</span> com.acme.payment.PaymentClient;
+<span class="ln"> 4</span><span class="kw">import</span> org.springframework.stereotype.<span class="ty">Service</span>;
+<span class="ln"> 5</span><span class="kw">import</span> org.springframework.transaction.annotation.<span class="ty">Transactional</span>;
+<span class="ln"> 6</span><span class="kw">import</span> java.math.<span class="ty">BigDecimal</span>;
+<span class="ln"> 7</span><span class="kw">import</span> java.util.<span class="ty">List</span>;
+<span class="ln"> 8</span>
+<span class="ln"> 9</span><span class="an">@Service</span>
+<span class="ln">10</span><span class="kw">public class</span> <span class="ty">OrderService</span> {
+<span class="ln">11</span>
+<span class="ln">12</span>    <span class="kw">private final</span> <span class="ty">OrderRepository</span> <span class="fd">orderRepository</span>;
+<span class="ln">13</span>    <span class="kw">private final</span> <span class="ty">PaymentClient</span> <span class="fd">paymentClient</span>;
+<span class="ln">14</span>
+<span class="ln">15</span>    <span class="kw">public</span> <span class="fn">OrderService</span>(<span class="ty">OrderRepository</span> orderRepository, <span class="ty">PaymentClient</span> paymentClient) {
+<span class="ln">16</span>        <span class="kw">this</span>.<span class="fd">orderRepository</span> = orderRepository;
+<span class="ln">17</span>        <span class="kw">this</span>.<span class="fd">paymentClient</span> = paymentClient;
+<span class="ln">18</span>    }
+<span class="ln">19</span>
+<span class="ln">20</span>    <span class="an">@Transactional</span>
+<span class="ln">21</span>    <span class="kw">public</span> <span class="ty">Order</span> <span class="fn">placeOrder</span>(<span class="ty">CreateOrderRequest</span> request) {
+<span class="ln">22</span>        <span class="ty">BigDecimal</span> total = request.<span class="fn">items</span>().<span class="fn">stream</span>()
+<span class="ln">23</span>                .<span class="fn">map</span>(item -> item.<span class="fn">price</span>().<span class="fn">multiply</span>(<span class="ty">BigDecimal</span>.<span class="fn">valueOf</span>(item.<span class="fn">quantity</span>())))
+<span class="ln">24</span>                .<span class="fn">reduce</span>(<span class="ty">BigDecimal</span>.<span class="fd">ZERO</span>, <span class="ty">BigDecimal</span>::<span class="fn">add</span>);
+<span class="ln">25</span>
+<span class="ln">26</span>        <span class="kw">if</span> (total.<span class="fn">compareTo</span>(<span class="ty">BigDecimal</span>.<span class="fd">ZERO</span>) <= <span class="nu">0</span>) {
+<span class="ln">27</span>            <span class="kw">throw new</span> <span class="ty">IllegalArgumentException</span>(<span class="st">"Order total must be positive"</span>);
+<span class="ln">28</span>        }
+<span class="ln">29</span>
+<span class="ln">30</span>        <span class="ty">Order</span> order = <span class="ty">Order</span>.<span class="fn">create</span>(request.<span class="fn">customerId</span>(), request.<span class="fn">items</span>(), total);
+<span class="ln">31</span>        <span class="fd">orderRepository</span>.<span class="fn">save</span>(order);
+<span class="ln">32</span>
+<span class="ln">33</span>        <span class="ty">PaymentResult</span> result = <span class="fd">paymentClient</span>.<span class="fn">charge</span>(order.<span class="fn">id</span>(), total);
+<span class="ln">34</span>        <span class="kw">if</span> (!result.<span class="fn">success</span>()) {
+<span class="ln">35</span>            order.<span class="fn">markFailed</span>(result.<span class="fn">reason</span>());
+<span class="ln">36</span>            <span class="kw">return</span> order;
+<span class="ln">37</span>        }
+<span class="ln">38</span>
+<span class="ln">39</span>        order.<span class="fn">markPaid</span>(result.<span class="fn">transactionId</span>());
+<span class="ln">40</span>        <span class="kw">return</span> order;
+<span class="ln">41</span>    }
+<span class="ln">42</span>
+<span class="ln">43</span>    <span class="kw">public</span> <span class="ty">List</span>&lt;<span class="ty">Order</span>&gt; <span class="fn">findRecent</span>(<span class="ty">String</span> customerId, <span class="kw">int</span> limit) {
+<span class="ln">44</span>        <span class="cm">// TODO: move paging to repository layer</span>
+<span class="ln">45</span>        <span class="kw">return</span> <span class="fd">orderRepository</span>.<span class="fn">findByCustomerIdOrderByCreatedAtDesc</span>(customerId)
+<span class="ln">46</span>                .<span class="fn">stream</span>()
+<span class="ln">47</span>                .<span class="fn">limit</span>(limit)
+<span class="ln">48</span>                .<span class="fn">toList</span>();
+<span class="ln">49</span>    }
+<span class="ln">50</span>}
+</pre>
+</div>
+
+<script src="js/i18n.js?v=917bab13"></script>
+<script src="js/cards.js?v=917bab13"></script>
+<script src="js/charts.js?v=917bab13"></script>
+<script src="js/engine.js?v=917bab13"></script>
+<script src="js/eqtable.js?v=917bab13"></script>
+<script src="js/icm.js?v=917bab13"></script>
+<script src="js/modes.js?v=917bab13"></script>
+<script src="js/multiway.js?v=917bab13"></script>
+<script src="js/classify.js?v=917bab13"></script>
+<script src="js/compute-fns.js?v=917bab13"></script>
+<script src="js/compute.js?v=917bab13"></script>
+<script src="js/app.js?v=917bab13"></script>
+</body>
+</html>

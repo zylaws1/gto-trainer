@@ -1,0 +1,26 @@
+# Cloudflare Pages response headers.
+# Everything is self-hosted, so the policy only allows this origin. Inline style attributes are used
+# for range-grid colours, hence 'unsafe-inline' for styles only (never for scripts).
+# If you later add Cloudflare Web Analytics, add https://static.cloudflareinsights.com to script-src
+# and https://cloudflareinsights.com to connect-src.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000
+
+# The page itself is always revalidated so a new deploy is picked up immediately.
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+
+# Scripts, styles and icons are requested with ?v=<commit>, so they can be cached for a year.
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+/*.svg
+  Cache-Control: public, max-age=86400
